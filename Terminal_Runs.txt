@@ -1,0 +1,56 @@
+[sudo] password for severscanor: 
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# go run main.go /bin/bash
+panic: Wrong Command
+
+goroutine 1 [running]:
+main.main()
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:17 +0x7e
+exit status 2
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# go run main.go run /bin/bash
+Running (In Parent) [/bin/bash]
+Running (In Child) [/bin/bash]
+[root@container_zero /]# hostname
+bash: hostname: command not found
+[root@container_zero /]# exit
+exit
+panic: exit status 127
+
+goroutine 1 [running]:
+main.checkErr(...)
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:56
+main.child()
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:51 +0x205
+main.main()
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:15 +0x65
+panic: exit status 2
+
+goroutine 1 [running]:
+main.checkErr(...)
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:56
+main.run()
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:35 +0x276
+main.main()
+        /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/main.go:13 +0x47
+exit status 2
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# sudo ls /home/severscanor/Desktop/Tanmay/Projects/
+ContainerZero/manjaro_fs/usr/bin/hostname
+ls: cannot access '/home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/bin/hostname': No such file or directory
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# sudo cp /usr/bin/hostname /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/bin/
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# sudo ls /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/bin/hostname
+/home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/bin/hostname
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# sudo cp /usr/lib/libc.so.6 /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/lib/
+sudo cp /usr/lib64/ld-linux-x86-64.so.2 /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/man
+jaro_fs/usr/lib64/
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# sudo chmod 755 /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/bin/hostname
+sudo chmod 755 /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/lib/libc.so.6
+                                                                                                   
+sudo chmod 755 /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/usr/lib64/ld-linu
+x-x86-64.so.2
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# go run main.go run /bin/bash
+Running (In Parent) [/bin/bash]
+Running (In Child) [/bin/bash]
+[root@container_zero /]# hostname
+container_zero
+[root@container_zero /]# exit
+exit
+

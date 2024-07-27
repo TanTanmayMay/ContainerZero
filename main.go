@@ -45,6 +45,9 @@ func child() {
 	cmd.Stderr = os.Stderr
 
 	checkErr(syscall.Sethostname([]byte("container_zero")))
+	checkErr(syscall.Chroot("./manjaro_fs"))
+	// Change directory after chroot
+	checkErr(os.Chdir("./manjaro_fs"))
 	checkErr(cmd.Run())
 }
 
