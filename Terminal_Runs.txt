@@ -54,3 +54,21 @@ container_zero
 [root@container_zero /]# exit
 exit
 
+******************************* NAMESPACING MOUNT ***************
+
+// [ON HOST]
+❯ mount | grep something2
+❯ ls /home/severscanor/Desktop/Tanmay/Projects/ContainerZero/manjaro_fs/mytemp
+
+// [IN CONTAINER]
+[tanmay-hppavilionlaptop14dv2xxx ContainerZero]# go run main.go run /bin/bash
+Running (In Parent) [/bin/bash]
+Running (In Child) [/bin/bash]
+Mounting in the new namespace...
+[root@container_zero /]# mount
+proc on /proc type proc (rw,relatime)
+something2 on /mytemp type tmpfs (rw,relatime,inode64)
+[root@container_zero /]# ls mytemp/
+[root@container_zero /]# touch mytemp/TanTanmayMay
+[root@container_zero /]# ls mytemp/
+TanTanmayMay
