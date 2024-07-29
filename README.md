@@ -65,10 +65,5 @@ https://medium.com/@teddyking/namespaces-in-go-uts-d47aebcdf00e
 
 ---
 
-### Understand Container
-https://pierrchen.blogspot.com/2018/08/understand-container-index.html
-
----
-
 PS: the contents of `manjaro_fs.zip` file has been extracted from Arch-Linux docker image (using `docker export...` command). You'll find entire log inside `Filesystem_Chroot_Setup.txt` file. :)
 
