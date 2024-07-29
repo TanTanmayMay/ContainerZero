@@ -19,10 +19,72 @@ func main() {
 		run()
 	case "child":
 		child()
+	case "runRootless":
+		RunRootless()
+	case "childRootless":
+		ChildRootless()
 	default:
 		panic("Wrong Command")
 	}
 }
+
+func RunRootless() {
+	fmt.Printf("Running (In Parent) %v\n", os.Args[2:])
+
+	// cmd is typically a variable representing an instance of exec.Cmd, which is used to execute external commands.
+	cmd := exec.Command("/proc/self/exe", append([]string{"childRootless"}, os.Args[2:]...)...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS | syscall.CLONE_NEWUSER,
+		// Rootless Container
+		Credential: &syscall.Credential{Uid: 0, Gid: 0},
+		UidMappings: []syscall.SysProcIDMap{
+			{ContainerID: 0, HostID: os.Getuid(), Size: 1},
+		},
+		GidMappings: []syscall.SysProcIDMap{
+			{ContainerID: 0, HostID: os.Getgid(), Size: 1},
+		},
+	}
+
+	// syscall.Sethostname([]byte("container")); -> Setting prompt name here will not work because
+	// Namespace is not set until we hit the cmd.Run() command
+	checkErr(cmd.Run())
+}
+
+func ChildRootless() {
+	fmt.Printf("Running (In Child) %v\n", os.Args[2:])
+
+	// Unshare mount namespace
+	checkErr(syscall.Unshare(syscall.CLONE_NEWNS))
+
+	// Remount / as private to make sure changes are not propagated to the host
+	checkErr(syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, ""))
+
+	checkErr(syscall.Sethostname([]byte("container_zero")))
+	checkErr(syscall.Chroot("./manjaro_fs"))
+	// Change directory after chroot
+	checkErr(os.Chdir("/"))
+
+	fmt.Println("Mounting in the new namespace...")
+	// Mount proc and tmpfs in the new mount namespace
+	checkErr(syscall.Mount("proc", "/proc", "proc", 0, ""))
+	checkErr(syscall.Mount("something2", "/mytemp", "tmpfs", 0, ""))
+
+	// cmd is typically a variable representing an instance of exec.Cmd, which is used to execute external commands.
+	cmd := exec.Command(os.Args[2], os.Args[3:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	checkErr(cmd.Run())
+
+	fmt.Println("Unmounting in the new namespace...")
+
+	checkErr(syscall.Unmount("/proc", 0))
+	checkErr(syscall.Unmount("/mytemp", 0))
+}
+
 
 func run() {
 	fmt.Printf("Running (In Parent) %v\n", os.Args[2:])
@@ -50,7 +112,7 @@ func child() {
 	checkErr(syscall.Unshare(syscall.CLONE_NEWNS))
 
 	// Remount / as private to make sure changes are not propagated to the host
-	checkErr(syscall.Mount("", "/", "", syscall.MS_PRIVATE | syscall.MS_REC, ""))
+	checkErr(syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, ""))
 
 	checkErr(syscall.Sethostname([]byte("container_zero")))
 	checkErr(syscall.Chroot("./manjaro_fs"))
