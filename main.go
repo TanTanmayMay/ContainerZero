@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 	"syscall"
 )
 
@@ -42,11 +44,13 @@ func run() {
 func child() {
 	fmt.Printf("Running (In Child) %v\n", os.Args[2:])
 
+	cg()
+
 	// Unshare mount namespace
 	checkErr(syscall.Unshare(syscall.CLONE_NEWNS))
 
 	// Remount / as private to make sure changes are not propagated to the host
-	checkErr(syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, ""))
+	checkErr(syscall.Mount("", "/", "", syscall.MS_PRIVATE | syscall.MS_REC, ""))
 
 	checkErr(syscall.Sethostname([]byte("container_zero")))
 	checkErr(syscall.Chroot("./manjaro_fs"))
@@ -69,6 +73,18 @@ func child() {
 
 	checkErr(syscall.Unmount("/proc", 0))
 	checkErr(syscall.Unmount("/mytemp", 0))
+}
+
+func cg() {
+	cgroups := "/sys/fs/cgroup"
+	mem := filepath.Join(cgroups, "memory")
+	os.Mkdir(filepath.Join(mem, "tantanmaymay"), 0755)
+	checkErr(os.WriteFile(filepath.Join(mem, "tantanmaymay/memory.limit_in_bytes"), []byte("999424"), 0700))
+	checkErr(os.WriteFile(filepath.Join(mem, "tantanmaymay/memory.memsw.limit_in_bytes"), []byte("999424"), 0700))
+	checkErr(os.WriteFile(filepath.Join(mem, "tantanmaymay/notify_on_release"), []byte("1"), 0700))
+
+	pid := strconv.Itoa(os.Getpid())
+	checkErr(os.WriteFile(filepath.Join(mem, "tantanmaymay/cgroup.proc"), []byte(pid), 0700))
 }
 
 func checkErr(err error) {
