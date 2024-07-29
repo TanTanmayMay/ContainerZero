@@ -1,4 +1,4 @@
-# Building Containers from Scratch in Go
+# Building Container-Zero from Scratch in Go
 
 This is a toy container build from scratch in Go solely for learning purpose. It uses namespaces and cgroups, mount a tmpfs that's isolated from host filesystem.
 
